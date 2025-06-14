@@ -49,6 +49,7 @@ kotlin {
                 implementation("junit:junit:4.13.2")
                 implementation("org.mockito:mockito-core:5.8.0")
                 implementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
             }
         }
     }
