@@ -25,8 +25,9 @@ class DiceUseCaseTest {
     }
 
     @Test
-    fun `正常なダイスを振れる`() = runBlocking {
-        val result = useCase.rollDice(sides = 6, count = 1)
+    fun `正常なダイスを振れる`() {
+        runBlocking {
+            val result = useCase.rollDice(sides = 6, count = 1)
         
         assertTrue(result.isSuccess)
         result.getOrNull()?.let { roll ->
@@ -34,10 +35,12 @@ class DiceUseCaseTest {
             assertEquals(1, roll.dice.count)
             assertTrue(roll.results[0] in 1..6)
         }
+        }
     }
 
     @Test
-    fun `修正値付きでダイスを振れる`() = runBlocking {
+    fun `修正値付きでダイスを振れる`() {
+        runBlocking {
         val fixedRandom = Random(42)
         val result = useCase.rollDice(sides = 6, modifier = 3, random = fixedRandom)
         
@@ -46,10 +49,12 @@ class DiceUseCaseTest {
             assertEquals(3, roll.modifier)
             assertEquals(roll.sum + 3, roll.total)
         }
+        }
     }
 
     @Test
-    fun `複数ダイスを振れる`() = runBlocking {
+    fun `複数ダイスを振れる`() {
+        runBlocking {
         val result = useCase.rollDice(sides = 6, count = 3)
         
         assertTrue(result.isSuccess)
@@ -59,18 +64,22 @@ class DiceUseCaseTest {
                 assertTrue(value in 1..6)
             }
         }
+        }
     }
 
     @Test
-    fun `不正なダイス面数でエラーになる`() = runBlocking {
+    fun `不正なダイス面数でエラーになる`() {
+        runBlocking {
         val result = useCase.rollDice(sides = 0)
         
         assertFalse(result.isSuccess)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+        }
     }
 
     @Test
-    fun `StandardDiceを振れる`() = runBlocking {
+    fun `StandardDiceを振れる`() {
+        runBlocking {
         val result = useCase.rollStandardDice(StandardDice.D20)
         
         assertTrue(result.isSuccess)
@@ -78,10 +87,12 @@ class DiceUseCaseTest {
             assertEquals(20, roll.dice.sides)
             assertTrue(roll.results[0] in 1..20)
         }
+        }
     }
 
     @Test
-    fun `複数の異なるダイスを同時に振れる`() = runBlocking {
+    fun `複数の異なるダイスを同時に振れる`() {
+        runBlocking {
         val diceList = listOf(
             Dice(sides = 6),
             Dice(sides = 20),
@@ -98,10 +109,12 @@ class DiceUseCaseTest {
             assertEquals(4, rolls[2].dice.sides)
             assertEquals(2, rolls[2].results.size)
         }
+        }
     }
 
     @Test
-    fun `ダイス記法を解析して振れる - 基本形`() = runBlocking {
+    fun `ダイス記法を解析して振れる - 基本形`() {
+        runBlocking {
         val result = useCase.parseDiceNotation("2d6")
         
         assertTrue(result.isSuccess)
@@ -110,10 +123,12 @@ class DiceUseCaseTest {
             assertEquals(2, roll.dice.count)
             assertEquals(0, roll.modifier)
         }
+        }
     }
 
     @Test
-    fun `ダイス記法を解析して振れる - 修正値付き`() = runBlocking {
+    fun `ダイス記法を解析して振れる - 修正値付き`() {
+        runBlocking {
         val result = useCase.parseDiceNotation("1d20+5")
         
         assertTrue(result.isSuccess)
@@ -122,10 +137,12 @@ class DiceUseCaseTest {
             assertEquals(1, roll.dice.count)
             assertEquals(5, roll.modifier)
         }
+        }
     }
 
     @Test
-    fun `ダイス記法を解析して振れる - 負の修正値`() = runBlocking {
+    fun `ダイス記法を解析して振れる - 負の修正値`() {
+        runBlocking {
         val result = useCase.parseDiceNotation("3d8-2")
         
         assertTrue(result.isSuccess)
@@ -134,10 +151,12 @@ class DiceUseCaseTest {
             assertEquals(3, roll.dice.count)
             assertEquals(-2, roll.modifier)
         }
+        }
     }
 
     @Test
-    fun `不正なダイス記法でエラーになる`() = runBlocking {
+    fun `不正なダイス記法でエラーになる`() {
+        runBlocking {
         val invalidNotations = listOf(
             "invalid",
             "d6",
@@ -151,19 +170,23 @@ class DiceUseCaseTest {
             val result = useCase.parseDiceNotation(notation)
             assertFalse(result.isSuccess, "記法 '$notation' はエラーになるべきです")
         }
+        }
     }
 
     @Test
-    fun `ダイス結果がリポジトリに保存される`() = runBlocking {
+    fun `ダイス結果がリポジトリに保存される`() {
+        runBlocking {
         useCase.rollDice(sides = 6)
         useCase.rollDice(sides = 20)
         
         val allRolls = useCase.getAllRolls().first()
         assertEquals(2, allRolls.size)
+        }
     }
 
     @Test
-    fun `特定の面数のダイス結果を取得できる`() = runBlocking {
+    fun `特定の面数のダイス結果を取得できる`() {
+        runBlocking {
         useCase.rollDice(sides = 6)
         useCase.rollDice(sides = 6)
         useCase.rollDice(sides = 20)
@@ -173,10 +196,12 @@ class DiceUseCaseTest {
         
         val d20Rolls = useCase.getRollsByDiceType(20).first()
         assertEquals(1, d20Rolls.size)
+        }
     }
 
     @Test
-    fun `履歴をクリアできる`() = runBlocking {
+    fun `履歴をクリアできる`() {
+        runBlocking {
         useCase.rollDice(sides = 6)
         
         val beforeClear = useCase.getAllRolls().first()
@@ -187,10 +212,12 @@ class DiceUseCaseTest {
         
         val afterClear = useCase.getAllRolls().first()
         assertEquals(0, afterClear.size)
+        }
     }
 
     @Test
-    fun `統計情報を取得できる`() = runBlocking {
+    fun `統計情報を取得できる`() {
+        runBlocking {
         repeat(5) {
             useCase.rollDice(sides = 6)
         }
@@ -198,15 +225,18 @@ class DiceUseCaseTest {
         val statistics = useCase.getDiceStatistics(6)
         assertEquals(5, statistics.totalRolls)
         assertTrue(statistics.averageResult > 0.0)
+        }
     }
 
     @Test
-    fun `ランダムなダイスを振れる`() = runBlocking {
+    fun `ランダムなダイスを振れる`() {
+        runBlocking {
         val result = useCase.getRandomRoll()
         
         assertTrue(result.isSuccess)
         result.getOrNull()?.let { roll ->
             assertTrue(roll.dice.sides in listOf(4, 6, 8, 10, 12, 20))
+        }
         }
     }
 }

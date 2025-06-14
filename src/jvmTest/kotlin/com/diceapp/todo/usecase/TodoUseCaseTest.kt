@@ -23,7 +23,8 @@ class TodoUseCaseTest {
     }
 
     @Test
-    fun `正常なタイトルでTodoを作成できる`() = runBlocking {
+    fun `正常なタイトルでTodoを作成できる`() {
+        runBlocking {
         val result = useCase.createTodo(
             title = "新しいタスク",
             description = "詳細な説明",
@@ -41,109 +42,127 @@ class TodoUseCaseTest {
     }
 
     @Test
-    fun `空のタイトルでTodoを作成するとエラーになる`() = runBlocking {
-        val result = useCase.createTodo(title = "")
-        
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-    }
-
-    @Test
-    fun `空白のみのタイトルでTodoを作成するとエラーになる`() = runBlocking {
-        val result = useCase.createTodo(title = "   ")
-        
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-    }
-
-    @Test
-    fun `タイトルの前後の空白は自動的に削除される`() = runBlocking {
-        val result = useCase.createTodo(title = "  タスク  ")
-        
-        assertTrue(result.isSuccess)
-        result.getOrNull()?.let { todo ->
-            assertEquals("タスク", todo.title)
+    fun `空のタイトルでTodoを作成するとエラーになる`() {
+        runBlocking {
+            val result = useCase.createTodo(title = "")
+            
+            assertTrue(result.isFailure)
+            assertTrue(result.exceptionOrNull() is IllegalArgumentException)
         }
     }
 
     @Test
-    fun `存在するTodoを更新できる`() = runBlocking {
-        val createResult = useCase.createTodo(title = "元のタスク")
-        assertTrue(createResult.isSuccess)
-        
-        val createdTodo = createResult.getOrNull()!!
-        val updateResult = useCase.updateTodo(
-            id = createdTodo.id,
-            title = "更新されたタスク",
-            priority = Priority.HIGH
-        )
-        
-        assertTrue(updateResult.isSuccess)
-        updateResult.getOrNull()?.let { updatedTodo ->
-            assertEquals("更新されたタスク", updatedTodo.title)
-            assertEquals(Priority.HIGH, updatedTodo.priority)
-            assertEquals(createdTodo.id, updatedTodo.id)
+    fun `空白のみのタイトルでTodoを作成するとエラーになる`() {
+        runBlocking {
+            val result = useCase.createTodo(title = "   ")
+            
+            assertTrue(result.isFailure)
+            assertTrue(result.exceptionOrNull() is IllegalArgumentException)
         }
     }
 
     @Test
-    fun `存在しないTodoを更新するとエラーになる`() = runBlocking {
-        val result = useCase.updateTodo(
-            id = "存在しないID",
-            title = "新しいタイトル"
-        )
-        
-        assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+    fun `タイトルの前後の空白は自動的に削除される`() {
+        runBlocking {
+            val result = useCase.createTodo(title = "  タスク  ")
+            
+            assertTrue(result.isSuccess)
+            result.getOrNull()?.let { todo ->
+                assertEquals("タスク", todo.title)
+            }
+        }
     }
 
     @Test
-    fun `更新時にタイトルを空にするとエラーになる`() = runBlocking {
-        val createResult = useCase.createTodo(title = "元のタスク")
-        val createdTodo = createResult.getOrNull()!!
-        
-        val updateResult = useCase.updateTodo(
-            id = createdTodo.id,
-            title = ""
-        )
-        
-        assertTrue(updateResult.isFailure)
-        assertTrue(updateResult.exceptionOrNull() is IllegalArgumentException)
+    fun `存在するTodoを更新できる`() {
+        runBlocking {
+            val createResult = useCase.createTodo(title = "元のタスク")
+            assertTrue(createResult.isSuccess)
+            
+            val createdTodo = createResult.getOrNull()!!
+            val updateResult = useCase.updateTodo(
+                id = createdTodo.id,
+                title = "更新されたタスク",
+                priority = Priority.HIGH
+            )
+            
+            assertTrue(updateResult.isSuccess)
+            updateResult.getOrNull()?.let { updatedTodo ->
+                assertEquals("更新されたタスク", updatedTodo.title)
+                assertEquals(Priority.HIGH, updatedTodo.priority)
+                assertEquals(createdTodo.id, updatedTodo.id)
+            }
+        }
     }
 
     @Test
-    fun `Todoを削除できる`() = runBlocking {
-        val createResult = useCase.createTodo(title = "削除対象")
-        val createdTodo = createResult.getOrNull()!!
-        
-        val deleteResult = useCase.deleteTodo(createdTodo.id)
-        assertTrue(deleteResult.isSuccess)
-        
-        val retrievedTodo = useCase.getTodoById(createdTodo.id)
-        assertEquals(null, retrievedTodo)
+    fun `存在しないTodoを更新するとエラーになる`() {
+        runBlocking {
+            val result = useCase.updateTodo(
+                id = "存在しないID",
+                title = "新しいタイトル"
+            )
+            
+            assertTrue(result.isFailure)
+            assertTrue(result.exceptionOrNull() is IllegalArgumentException)
+        }
     }
 
     @Test
-    fun `Todo完了状態を切り替えできる`() = runBlocking {
-        val createResult = useCase.createTodo(title = "完了切り替えテスト")
-        val createdTodo = createResult.getOrNull()!!
-        assertFalse(createdTodo.isCompleted)
-        
-        val toggleResult = useCase.toggleTodoCompletion(createdTodo.id)
-        assertTrue(toggleResult.isSuccess)
-        
-        val retrievedTodo = useCase.getTodoById(createdTodo.id)
-        assertTrue(retrievedTodo?.isCompleted ?: false)
+    fun `更新時にタイトルを空にするとエラーになる`() {
+        runBlocking {
+            val createResult = useCase.createTodo(title = "元のタスク")
+            val createdTodo = createResult.getOrNull()!!
+            
+            val updateResult = useCase.updateTodo(
+                id = createdTodo.id,
+                title = ""
+            )
+            
+            assertTrue(updateResult.isFailure)
+            assertTrue(updateResult.exceptionOrNull() is IllegalArgumentException)
+        }
     }
 
     @Test
-    fun `カテゴリ別でTodoを取得できる`() = runBlocking {
-        useCase.createTodo(title = "仕事1", category = "仕事")
-        useCase.createTodo(title = "仕事2", category = "仕事")
-        useCase.createTodo(title = "プライベート1", category = "プライベート")
-        
-        val categories = useCase.getAllCategories()
-        assertTrue(categories.contains("仕事"))
-        assertTrue(categories.contains("プライベート"))
+    fun `Todoを削除できる`() {
+        runBlocking {
+            val createResult = useCase.createTodo(title = "削除対象")
+            val createdTodo = createResult.getOrNull()!!
+            
+            val deleteResult = useCase.deleteTodo(createdTodo.id)
+            assertTrue(deleteResult.isSuccess)
+            
+            val retrievedTodo = useCase.getTodoById(createdTodo.id)
+            assertEquals(null, retrievedTodo)
+        }
+    }
+
+    @Test
+    fun `Todo完了状態を切り替えできる`() {
+        runBlocking {
+            val createResult = useCase.createTodo(title = "完了切り替えテスト")
+            val createdTodo = createResult.getOrNull()!!
+            assertFalse(createdTodo.isCompleted)
+            
+            val toggleResult = useCase.toggleTodoCompletion(createdTodo.id)
+            assertTrue(toggleResult.isSuccess)
+            
+            val retrievedTodo = useCase.getTodoById(createdTodo.id)
+            assertTrue(retrievedTodo?.isCompleted ?: false)
+        }
+    }
+
+    @Test
+    fun `カテゴリ別でTodoを取得できる`() {
+        runBlocking {
+            useCase.createTodo(title = "仕事1", category = "仕事")
+            useCase.createTodo(title = "仕事2", category = "仕事")
+            useCase.createTodo(title = "プライベート1", category = "プライベート")
+            
+            val categories = useCase.getAllCategories()
+            assertTrue(categories.contains("仕事"))
+            assertTrue(categories.contains("プライベート"))
+        }
     }
 }

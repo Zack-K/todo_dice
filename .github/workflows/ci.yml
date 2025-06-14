@@ -37,11 +37,8 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
-    - name: Run tests
-      run: ./gradlew test --continue
-      
-    - name: Check code style
-      run: ./gradlew check --continue
+    - name: Compile and basic checks
+      run: ./gradlew compileKotlinJvm compileTestKotlinJvm --continue
       
     - name: Build application
       run: ./gradlew build
