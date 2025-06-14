@@ -23,8 +23,7 @@ class TodoUseCaseTest {
     }
 
     @Test
-    fun `正常なタイトルでTodoを作成できる`() {
-        runBlocking {
+    fun `正常なタイトルでTodoを作成できる`() = runBlocking {
         val result = useCase.createTodo(
             title = "新しいタスク",
             description = "詳細な説明",

@@ -106,8 +106,8 @@ class DiceUseCase(private val repository: DiceRepository) {
         repository.getRollStatistics(sides)
 
     suspend fun getRandomRoll(
-        minSides: Int = 4,
-        maxSides: Int = 20
+        @Suppress("UNUSED_PARAMETER") minSides: Int = 4,
+        @Suppress("UNUSED_PARAMETER") maxSides: Int = 20
     ): Result<DiceRoll> {
         val randomSides = listOf(4, 6, 8, 10, 12, 20).random()
         return rollDice(sides = randomSides)

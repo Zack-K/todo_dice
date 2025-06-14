@@ -79,7 +79,7 @@ class TodoUseCase(private val repository: TodoRepository) {
         return repository.getAllTodos()
     }
 
-    suspend fun getTodosByPriority(priority: Priority): Flow<List<Todo>> {
+    suspend fun getTodosByPriority(@Suppress("UNUSED_PARAMETER") priority: Priority): Flow<List<Todo>> {
         return repository.getAllTodos()
     }
 }
