@@ -1,0 +1,41 @@
+# Gradle
+.gradle/
+build/
+!**/src/**/build
+!**/test/**/build
+
+# Kotlin
+.kotlin/
+*.versionsBackup
+
+# IntelliJ IDEA
+.idea/
+*.iml
+!**/testData/**/*.iml
+
+# Android
+local.properties
+/captures
+.externalNativeBuild
+.cxx
+
+# Platform-specific
+.DS_Store
+out/
+
+# Compose Multiplatform specific
+prebuilds/
+/tmp
+
+# Runtime
+/logs
+*.log
+
+# Docker
+docker-compose.override.yml
+
+# Application specific
+/data
+*.db
+*.json
+!gradle/wrapper/gradle-wrapper.properties
