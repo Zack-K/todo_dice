@@ -1,0 +1,86 @@
+# =============================================================================
+# Build Stage: 完全な開発環境でアプリケーションをビルド
+# =============================================================================
+FROM openjdk:17-alpine@sha256:4b6abae565492dbe9e7a894137c966a7485154238902f2f25e9dbd9784383d81 AS builder
+
+# ビルド環境にのみ必要なパッケージ
+RUN apk add --no-cache \
+    wget \
+    unzip \
+    git \
+    curl \
+    bash \
+    gcompat \
+    libstdc++ \
+    && rm -rf /var/cache/apk/*
+
+# Android SDK環境変数
+ENV ANDROID_HOME=/opt/android-sdk
+ENV ANDROID_SDK_ROOT=${ANDROID_HOME}
+ENV PATH=${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools
+
+# Android SDK Command Line Tools
+RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdline-tools.zip && \
+    unzip -q /tmp/cmdline-tools.zip -d /tmp && \
+    mv /tmp/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest && \
+    rm /tmp/cmdline-tools.zip
+
+# Android SDKコンポーネント
+RUN yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses && \
+    ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \
+        "platform-tools" \
+        "platforms;android-34" \
+        "build-tools;34.0.0" \
+        --verbose
+
+# Gradle
+ENV GRADLE_VERSION=8.5
+RUN wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -P /tmp && \
+    unzip -d /opt/gradle /tmp/gradle-${GRADLE_VERSION}-bin.zip && \
+    ln -s /opt/gradle/gradle-${GRADLE_VERSION}/bin/gradle /usr/bin/gradle && \
+    rm /tmp/gradle-${GRADLE_VERSION}-bin.zip
+
+ENV GRADLE_HOME=/opt/gradle/gradle-${GRADLE_VERSION}
+ENV PATH=${GRADLE_HOME}/bin:${PATH}
+
+# アプリケーションコードをコピーしてビルド
+WORKDIR /app
+COPY . .
+
+# Desktop版をビルド（実行ファイルを生成）
+RUN ./gradlew :composeApp:compileKotlinDesktop
+RUN ./gradlew :composeApp:desktopTest
+
+# =============================================================================
+# Runtime Stage: 軽量な実行環境のみ
+# =============================================================================
+FROM eclipse-temurin:17-jre-alpine@sha256:b10e4fda9d71b3819a91fbb0dbb28512edbb37a45f6af2a301c780223bb42fb8 AS runtime
+
+# 実行に最低限必要なパッケージのみ
+RUN apk add --no-cache \
+    bash \
+    curl \
+    && rm -rf /var/cache/apk/*
+
+# 非rootユーザーを作成
+RUN addgroup -g 1000 diceapp && \
+    adduser -u 1000 -G diceapp -s /bin/bash -D diceapp
+
+# 作業ディレクトリを作成し権限設定
+WORKDIR /app
+RUN chown -R diceapp:diceapp /app
+
+# ビルドステージから必要なアーティファクトのみコピー
+COPY --from=builder --chown=diceapp:diceapp /app/composeApp/build /app/build
+COPY --from=builder --chown=diceapp:diceapp /app/gradlew /app/
+COPY --from=builder --chown=diceapp:diceapp /app/gradle /app/gradle
+COPY --from=builder --chown=diceapp:diceapp /app/gradle.properties /app/
+COPY --from=builder --chown=diceapp:diceapp /app/composeApp/build.gradle.kts /app/composeApp/
+
+# 非rootユーザーに切り替え
+USER diceapp
+
+EXPOSE 8080
+
+CMD ["bash"]
