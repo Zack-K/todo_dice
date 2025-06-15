@@ -74,14 +74,26 @@ class DiceUseCase(private val repository: DiceRepository) {
     private fun parseDiceString(notation: String): DiceNotation {
         val cleanNotation = notation.replace(" ", "").lowercase()
         
+        // 空文字列チェック
+        if (cleanNotation.isEmpty()) {
+            throw IllegalArgumentException("空の記法")
+        }
+        
         // "2d6+3" や "1d20-2" のような形式を解析
-        val regex = Regex("""(\d+)?d(\d+)([+-]\d+)?""")
+        // 数値は必須（d6は無効、1d6は有効）
+        val regex = Regex("""(\d+)d(\d+)([+-]\d+)?""")
         val match = regex.matchEntire(cleanNotation)
             ?: throw IllegalArgumentException("無効な形式")
 
-        val count = match.groupValues[1].takeIf { it.isNotEmpty() }?.toInt() ?: 1
+        val count = match.groupValues[1].toInt()
         val sides = match.groupValues[2].toInt()
         val modifierStr = match.groupValues[3]
+        
+        // バリデーション
+        if (count <= 0 || sides <= 0) {
+            throw IllegalArgumentException("ダイスの数と面数は1以上である必要があります")
+        }
+        
         val modifier = when {
             modifierStr.isEmpty() -> 0
             modifierStr.startsWith("+") -> modifierStr.substring(1).toInt()

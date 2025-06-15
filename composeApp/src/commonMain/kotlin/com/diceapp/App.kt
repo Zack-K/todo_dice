@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.diceapp.core.config.AppConfig
 import com.diceapp.todo.ui.TodoScreen
 import com.diceapp.randomselector.ui.RandomSelectorScreen
