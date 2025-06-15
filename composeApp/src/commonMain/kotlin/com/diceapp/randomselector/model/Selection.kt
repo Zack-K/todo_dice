@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Selection(
-    val id: String = java.util.UUID.randomUUID().toString(),
+    val id: String = com.benasher44.uuid.uuid4().toString(),
     val items: List<SelectionItem>,
     val title: String = "ランダム選択",
-    val timestamp: String = java.time.LocalDateTime.now().toString()
+    val timestamp: String = kotlinx.datetime.Clock.System.now().toString()
 ) {
     init {
         require(items.isNotEmpty()) { "選択肢は1つ以上必要です" }
@@ -33,7 +33,7 @@ data class SelectionResult(
     val selection: Selection,
     val diceRoll: Int,
     val selectedItem: SelectionItem,
-    val timestamp: String = java.time.LocalDateTime.now().toString()
+    val timestamp: String = kotlinx.datetime.Clock.System.now().toString()
 )
 
 // TODOからSelectionItemを作成するヘルパー関数

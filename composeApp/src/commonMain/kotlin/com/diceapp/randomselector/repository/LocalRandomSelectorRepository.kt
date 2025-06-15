@@ -2,19 +2,19 @@ package com.diceapp.randomselector.repository
 
 import com.diceapp.randomselector.model.Selection
 import com.diceapp.randomselector.model.SelectionResult
+import com.diceapp.core.platform.FileSystem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.File
+import com.diceapp.core.logging.Logger
 
-class LocalRandomSelectorRepository(
-    private val dataDir: String = System.getProperty("user.home") + "/.diceapp"
-) : RandomSelectorRepository {
+class LocalRandomSelectorRepository : RandomSelectorRepository {
 
-    private val selectionsFile = File(dataDir, "selections.json")
-    private val resultsFile = File(dataDir, "selection_results.json")
+    private val dataDir = FileSystem.getDataDirectory()
+    private val selectionsFilePath = "$dataDir/selections.json"
+    private val resultsFilePath = "$dataDir/selection_results.json"
     private val json = Json { 
         prettyPrint = true
         ignoreUnknownKeys = true
@@ -24,37 +24,32 @@ class LocalRandomSelectorRepository(
     private val _results = MutableStateFlow<List<SelectionResult>>(emptyList())
 
     init {
-        File(dataDir).mkdirs()
         loadSelections()
         loadResults()
     }
 
     private fun loadSelections() {
         try {
-            if (selectionsFile.exists()) {
-                val jsonContent = selectionsFile.readText()
-                if (jsonContent.isNotBlank()) {
-                    val selections = json.decodeFromString<List<Selection>>(jsonContent)
-                    _selections.value = selections
-                }
+            val jsonContent = FileSystem.readTextFromFile(selectionsFilePath)
+            if (!jsonContent.isNullOrBlank()) {
+                val selections = json.decodeFromString<List<Selection>>(jsonContent)
+                _selections.value = selections
             }
         } catch (e: Exception) {
-            println("Failed to load selections: ${e.message}")
+            Logger.error("LocalRandomSelectorRepository", "Failed to load selections: ${e.message}")
             _selections.value = emptyList()
         }
     }
 
     private fun loadResults() {
         try {
-            if (resultsFile.exists()) {
-                val jsonContent = resultsFile.readText()
-                if (jsonContent.isNotBlank()) {
-                    val results = json.decodeFromString<List<SelectionResult>>(jsonContent)
-                    _results.value = results
-                }
+            val jsonContent = FileSystem.readTextFromFile(resultsFilePath)
+            if (!jsonContent.isNullOrBlank()) {
+                val results = json.decodeFromString<List<SelectionResult>>(jsonContent)
+                _results.value = results
             }
         } catch (e: Exception) {
-            println("Failed to load selection results: ${e.message}")
+            Logger.error("LocalRandomSelectorRepository", "Failed to load selection results: ${e.message}")
             _results.value = emptyList()
         }
     }
@@ -62,18 +57,18 @@ class LocalRandomSelectorRepository(
     private suspend fun saveSelections() {
         try {
             val jsonContent = json.encodeToString(_selections.value)
-            selectionsFile.writeText(jsonContent)
+            FileSystem.writeTextToFile(selectionsFilePath, jsonContent)
         } catch (e: Exception) {
-            println("Failed to save selections: ${e.message}")
+            Logger.error("LocalRandomSelectorRepository", "Failed to save selections: ${e.message}")
         }
     }
 
     private suspend fun saveResults() {
         try {
             val jsonContent = json.encodeToString(_results.value)
-            resultsFile.writeText(jsonContent)
+            FileSystem.writeTextToFile(resultsFilePath, jsonContent)
         } catch (e: Exception) {
-            println("Failed to save selection results: ${e.message}")
+            Logger.error("LocalRandomSelectorRepository", "Failed to save selection results: ${e.message}")
         }
     }
 
@@ -153,7 +148,7 @@ class LocalRandomSelectorRepository(
         val itemCounts = mutableMapOf<String, Int>()
         allResults.forEach { result ->
             val itemText = result.selectedItem.text
-            itemCounts[itemText] = itemCounts.getOrDefault(itemText, 0) + 1
+            itemCounts[itemText] = (itemCounts[itemText] ?: 0) + 1
         }
 
         return SelectionStatistics(

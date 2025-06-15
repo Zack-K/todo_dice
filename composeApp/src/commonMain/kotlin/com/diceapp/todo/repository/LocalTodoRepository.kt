@@ -1,19 +1,19 @@
 package com.diceapp.todo.repository
 
 import com.diceapp.todo.model.Todo
+import com.diceapp.core.platform.FileSystem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.File
-import java.time.LocalDateTime
+import kotlinx.datetime.Clock
+import com.diceapp.core.logging.Logger
 
-class LocalTodoRepository(
-    private val dataDir: String = System.getProperty("user.home") + "/.diceapp"
-) : TodoRepository {
+class LocalTodoRepository : TodoRepository {
 
-    private val todosFile = File(dataDir, "todos.json")
+    private val dataDir = FileSystem.getDataDirectory()
+    private val todosFilePath = "$dataDir/todos.json"
     private val json = Json { 
         prettyPrint = true
         ignoreUnknownKeys = true
@@ -22,21 +22,18 @@ class LocalTodoRepository(
     private val _todos = MutableStateFlow<List<Todo>>(emptyList())
 
     init {
-        File(dataDir).mkdirs()
         loadTodos()
     }
 
     private fun loadTodos() {
         try {
-            if (todosFile.exists()) {
-                val jsonContent = todosFile.readText()
-                if (jsonContent.isNotBlank()) {
-                    val todos = json.decodeFromString<List<Todo>>(jsonContent)
-                    _todos.value = todos
-                }
+            val jsonContent = FileSystem.readTextFromFile(todosFilePath)
+            if (!jsonContent.isNullOrBlank()) {
+                val todos = json.decodeFromString<List<Todo>>(jsonContent)
+                _todos.value = todos
             }
         } catch (e: Exception) {
-            println("Failed to load todos: ${e.message}")
+            Logger.error("LocalTodoRepository", "Failed to load todos: ${e.message}")
             _todos.value = emptyList()
         }
     }
@@ -44,9 +41,9 @@ class LocalTodoRepository(
     private suspend fun saveTodos() {
         try {
             val jsonContent = json.encodeToString(_todos.value)
-            todosFile.writeText(jsonContent)
+            FileSystem.writeTextToFile(todosFilePath, jsonContent)
         } catch (e: Exception) {
-            println("Failed to save todos: ${e.message}")
+            Logger.error("LocalTodoRepository", "Failed to save todos: ${e.message}")
         }
     }
 
@@ -80,7 +77,7 @@ class LocalTodoRepository(
             if (index == -1) {
                 Result.failure(IllegalArgumentException("Todo not found"))
             } else {
-                val updatedTodo = todo.copy(updatedAt = LocalDateTime.now().toString())
+                val updatedTodo = todo.copy(updatedAt = Clock.System.now().toString())
                 val updatedTodos = currentTodos.toMutableList()
                 updatedTodos[index] = updatedTodo
                 _todos.value = updatedTodos
@@ -118,7 +115,7 @@ class LocalTodoRepository(
                 val todo = currentTodos[todoIndex]
                 val updatedTodo = todo.copy(
                     isCompleted = !todo.isCompleted,
-                    updatedAt = LocalDateTime.now().toString()
+                    updatedAt = Clock.System.now().toString()
                 )
                 val updatedTodos = currentTodos.toMutableList()
                 updatedTodos[todoIndex] = updatedTodo

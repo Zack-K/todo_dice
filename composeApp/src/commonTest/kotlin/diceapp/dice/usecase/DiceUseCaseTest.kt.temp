@@ -1,9 +1,10 @@
-package com.diceapp.dice.usecase
+package diceapp.dice.usecase
 
 import com.diceapp.dice.model.Dice
 import com.diceapp.dice.model.StandardDice
 import com.diceapp.dice.repository.DiceRepository
-import com.diceapp.testutil.MockDiceRepository
+import com.diceapp.dice.usecase.DiceUseCase
+import diceapp.testutil.MockDiceRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

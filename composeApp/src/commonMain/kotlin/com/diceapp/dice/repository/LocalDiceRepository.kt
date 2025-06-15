@@ -1,18 +1,18 @@
 package com.diceapp.dice.repository
 
 import com.diceapp.dice.model.DiceRoll
+import com.diceapp.core.platform.FileSystem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.File
+import com.diceapp.core.logging.Logger
 
-class LocalDiceRepository(
-    private val dataDir: String = System.getProperty("user.home") + "/.diceapp"
-) : DiceRepository {
+class LocalDiceRepository : DiceRepository {
 
-    private val rollsFile = File(dataDir, "dice_rolls.json")
+    private val dataDir = FileSystem.getDataDirectory()
+    private val rollsFilePath = "$dataDir/dice_rolls.json"
     private val json = Json { 
         prettyPrint = true
         ignoreUnknownKeys = true
@@ -21,21 +21,18 @@ class LocalDiceRepository(
     private val _rolls = MutableStateFlow<List<DiceRoll>>(emptyList())
 
     init {
-        File(dataDir).mkdirs()
         loadRolls()
     }
 
     private fun loadRolls() {
         try {
-            if (rollsFile.exists()) {
-                val jsonContent = rollsFile.readText()
-                if (jsonContent.isNotBlank()) {
-                    val rolls = json.decodeFromString<List<DiceRoll>>(jsonContent)
-                    _rolls.value = rolls
-                }
+            val jsonContent = FileSystem.readTextFromFile(rollsFilePath)
+            if (!jsonContent.isNullOrBlank()) {
+                val rolls = json.decodeFromString<List<DiceRoll>>(jsonContent)
+                _rolls.value = rolls
             }
         } catch (e: Exception) {
-            println("Failed to load dice rolls: ${e.message}")
+            Logger.error("LocalDiceRepository", "Failed to load dice rolls: ${e.message}")
             _rolls.value = emptyList()
         }
     }
@@ -43,9 +40,9 @@ class LocalDiceRepository(
     private suspend fun saveRolls() {
         try {
             val jsonContent = json.encodeToString(_rolls.value)
-            rollsFile.writeText(jsonContent)
+            FileSystem.writeTextToFile(rollsFilePath, jsonContent)
         } catch (e: Exception) {
-            println("Failed to save dice rolls: ${e.message}")
+            Logger.error("LocalDiceRepository", "Failed to save dice rolls: ${e.message}")
         }
     }
 

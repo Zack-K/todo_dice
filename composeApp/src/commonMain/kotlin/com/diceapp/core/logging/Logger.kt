@@ -69,7 +69,7 @@ object Logger {
     private fun log(level: LogLevel, tag: String, message: String) {
         if (!isEnabled || level.priority < currentLevel.priority) return
         
-        val timestamp = System.currentTimeMillis()
+        val timestamp = com.diceapp.core.platform.AppClock.currentTimeMillis()
         val levelString = level.name.padEnd(7)
         println("$timestamp $levelString [$tag] $message")
     }

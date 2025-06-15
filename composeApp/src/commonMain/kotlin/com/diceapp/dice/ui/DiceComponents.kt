@@ -101,7 +101,7 @@ fun DiceRollResult(roll: DiceRoll) {
                 ) {
                     StatChip("最小", roll.min.toString())
                     StatChip("最大", roll.max.toString())
-                    StatChip("平均", String.format("%.1f", roll.average))
+                    StatChip("平均", "%.1f".format(roll.average))
                 }
             }
         }
@@ -210,7 +210,7 @@ fun DiceStatisticsDialog(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     StatRow("総ロール数", stats.totalRolls.toString())
-                    StatRow("平均値", String.format("%.2f", stats.averageResult))
+                    StatRow("平均値", "%.2f".format(stats.averageResult))
                     StatRow("最小値", stats.minResult.toString())
                     StatRow("最大値", stats.maxResult.toString())
                     StatRow("最頻値", stats.mostCommonResult.toString())

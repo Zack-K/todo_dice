@@ -52,6 +52,12 @@ kotlin {
             
             // Serialization
             implementation(libs.kotlinx.serialization.json)
+            
+            // DateTime
+            implementation(libs.kotlinx.datetime)
+            
+            // UUID
+            implementation(libs.uuid)
         }
         
         commonTest.dependencies {

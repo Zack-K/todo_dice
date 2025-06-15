@@ -1,11 +1,12 @@
-package com.diceapp.randomselector.usecase
+package diceapp.randomselector.usecase
 
 import com.diceapp.randomselector.repository.RandomSelectorRepository
-import com.diceapp.testutil.MockRandomSelectorRepository
+import com.diceapp.randomselector.usecase.RandomSelectorUseCase
 import com.diceapp.todo.model.Priority
 import com.diceapp.todo.model.Todo
 import com.diceapp.todo.repository.TodoRepository
-import com.diceapp.testutil.MockTodoRepository
+import diceapp.testutil.MockRandomSelectorRepository
+import diceapp.testutil.MockTodoRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

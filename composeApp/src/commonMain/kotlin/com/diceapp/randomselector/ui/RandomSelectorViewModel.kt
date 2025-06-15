@@ -179,10 +179,10 @@ class RandomSelectorViewModel {
         
         Logger.info("RandomSelectorViewModel", "ダイスアニメーション開始: ${config.diceAnimationDurationMs}ms")
         
-        val startTime = System.currentTimeMillis()
+        val startTime = com.diceapp.core.platform.AppClock.currentTimeMillis()
         val endTime = startTime + config.diceAnimationDurationMs
         
-        while (System.currentTimeMillis() < endTime) {
+        while (com.diceapp.core.platform.AppClock.currentTimeMillis() < endTime) {
             // ランダムなダイス値を表示（1-6の範囲）
             _animatingDiceValue.value = Random.nextInt(1, 7)
             delay(config.diceAnimationUpdateIntervalMs)

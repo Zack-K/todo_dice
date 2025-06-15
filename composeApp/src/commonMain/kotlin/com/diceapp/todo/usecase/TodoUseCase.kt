@@ -58,7 +58,7 @@ class TodoUseCase(private val repository: TodoRepository) {
             priority = priority ?: existingTodo.priority,
             category = category?.trim() ?: existingTodo.category,
             dueDate = dueDate ?: existingTodo.dueDate,
-            updatedAt = java.time.LocalDateTime.now().toString()
+            updatedAt = kotlinx.datetime.Clock.System.now().toString()
         )
 
         return repository.updateTodo(updatedTodo).map { updatedTodo }

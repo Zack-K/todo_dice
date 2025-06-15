@@ -24,7 +24,7 @@ data class DiceRoll(
     val dice: Dice,
     val results: List<Int>,
     val modifier: Int = 0,
-    val timestamp: String = java.time.LocalDateTime.now().toString()
+    val timestamp: String = kotlinx.datetime.Clock.System.now().toString()
 ) {
     val sum: Int = results.sum()
     val total: Int = sum + modifier
