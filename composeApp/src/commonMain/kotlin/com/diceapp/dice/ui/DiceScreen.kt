@@ -14,6 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.diceapp.dice.model.StandardDice
+import com.diceapp.core.ui.MobileOptimizedButton
+import com.diceapp.core.ui.ResponsiveSpacer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

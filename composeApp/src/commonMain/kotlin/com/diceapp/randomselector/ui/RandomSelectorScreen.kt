@@ -17,6 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.diceapp.core.ui.MobileOptimizedButton
+import com.diceapp.core.ui.AnimatedResultDisplay
+import com.diceapp.core.ui.ResponsiveSpacer
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)

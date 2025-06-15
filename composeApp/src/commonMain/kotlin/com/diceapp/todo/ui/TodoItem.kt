@@ -1,6 +1,7 @@
 package com.diceapp.todo.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -8,6 +9,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,9 +28,19 @@ fun TodoItem(
     onDelete: () -> Unit
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        showDeleteDialog = true
+                    }
+                )
+            },
         colors = CardDefaults.cardColors(
             containerColor = if (todo.isCompleted) 
                 MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
@@ -40,10 +54,14 @@ fun TodoItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 完了チェックボックス
+            // 完了チェックボックス - モバイル最適化
             Checkbox(
                 checked = todo.isCompleted,
-                onCheckedChange = { onToggleComplete() }
+                onCheckedChange = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onToggleComplete() 
+                },
+                modifier = Modifier.size(48.dp) // タッチターゲット拡大
             )
 
             Spacer(modifier = Modifier.width(12.dp))
