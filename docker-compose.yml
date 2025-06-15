@@ -7,9 +7,11 @@ services:
     volumes:
       - .:/app
       - gradle-cache:/root/.gradle
+      - android-sdk-cache:/opt/android-sdk
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     environment:
       - DISPLAY=${DISPLAY:-:0}
+      - ANDROID_HOME=/opt/android-sdk
     network_mode: host
     stdin_open: true
     tty: true
@@ -18,3 +20,4 @@ services:
 
 volumes:
   gradle-cache:
+  android-sdk-cache:

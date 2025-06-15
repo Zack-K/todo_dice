@@ -20,6 +20,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 34
+        build-tools: 34.0.0
+        
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
       with:
@@ -37,17 +43,14 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
-    - name: Run tests
-      run: ./gradlew test --continue
+    - name: Run Desktop tests
+      run: ./gradlew :composeApp:desktopTest
       
-    - name: Check code style
-      run: ./gradlew check --continue
+    - name: Build Desktop application
+      run: ./gradlew :composeApp:compileKotlinDesktop
       
-    - name: Build application
-      run: ./gradlew build
-      
-    - name: Test console application
-      run: ./gradlew runConsole
+    - name: Check Android compilation
+      run: ./gradlew :composeApp:compileDebugKotlinAndroid
       
     - name: Upload test results
       uses: actions/upload-artifact@v4
@@ -55,13 +58,13 @@ jobs:
       with:
         name: test-results
         path: |
-          build/reports/tests/
-          build/test-results/
+          composeApp/build/reports/tests/
+          composeApp/build/test-results/
           
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
         path: |
-          build/distributions/
-          build/libs/
+          composeApp/build/distributions/
+          composeApp/build/libs/
