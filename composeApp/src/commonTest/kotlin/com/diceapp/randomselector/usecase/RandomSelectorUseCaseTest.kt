@@ -1,17 +1,17 @@
-package diceapp.randomselector.usecase
+package com.diceapp.randomselector.usecase
 
 import com.diceapp.randomselector.repository.RandomSelectorRepository
 import com.diceapp.randomselector.usecase.RandomSelectorUseCase
 import com.diceapp.todo.model.Priority
 import com.diceapp.todo.model.Todo
 import com.diceapp.todo.repository.TodoRepository
-import diceapp.testutil.MockRandomSelectorRepository
-import diceapp.testutil.MockTodoRepository
+import com.diceapp.testutil.MockRandomSelectorRepository
+import com.diceapp.testutil.MockTodoRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
-import org.junit.Test
 import kotlin.random.Random
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -22,7 +22,7 @@ class RandomSelectorUseCaseTest {
     private lateinit var randomSelectorRepository: RandomSelectorRepository
     private lateinit var todoRepository: TodoRepository
 
-    @Before
+    @BeforeTest
     fun setup() {
         randomSelectorRepository = MockRandomSelectorRepository()
         todoRepository = MockTodoRepository()
@@ -39,7 +39,7 @@ class RandomSelectorUseCaseTest {
             assertEquals("テスト選択", selection.title)
             assertEquals(3, selection.items.size)
             assertEquals("選択肢1", selection.items[0].text)
-    }
+        }
     }
 
     @Test
@@ -48,7 +48,6 @@ class RandomSelectorUseCaseTest {
         
         assertFalse(result.isSuccess)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        }
     }
 
     @Test
@@ -58,7 +57,6 @@ class RandomSelectorUseCaseTest {
         
         assertFalse(result.isSuccess)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        }
     }
 
     @Test
@@ -79,7 +77,7 @@ class RandomSelectorUseCaseTest {
             assertEquals("仕事のタスク選択", selection.title)
             assertEquals(2, selection.items.size)
             assertEquals("タスク1", selection.items[0].text)
-    }
+        }
     }
 
     @Test
@@ -88,7 +86,6 @@ class RandomSelectorUseCaseTest {
         
         assertFalse(result.isSuccess)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        }
     }
 
     @Test
@@ -107,7 +104,7 @@ class RandomSelectorUseCaseTest {
         result.getOrNull()?.let { selection ->
             assertEquals(2, selection.items.size) // 完了済みは除外される
             assertTrue(selection.items.none { it.text == "完了済み" })
-    }
+        }
     }
 
     @Test
@@ -116,7 +113,6 @@ class RandomSelectorUseCaseTest {
         
         assertFalse(result.isSuccess)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        }
     }
 
     @Test
@@ -132,7 +128,7 @@ class RandomSelectorUseCaseTest {
         result.getOrNull()?.let { selectionResult ->
             assertTrue(selectionResult.diceRoll in 1..3)
             assertTrue(texts.contains(selectionResult.selectedItem.text))
-    }
+        }
     }
 
     @Test
@@ -141,7 +137,6 @@ class RandomSelectorUseCaseTest {
         
         assertFalse(result.isSuccess)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        }
     }
 
     @Test
@@ -156,7 +151,7 @@ class RandomSelectorUseCaseTest {
         result.getOrNull()?.let { selectionResult ->
             assertTrue(selectionResult.diceRoll in 1..2)
             assertTrue(texts.contains(selectionResult.selectedItem.text))
-    }
+        }
     }
 
     @Test
@@ -172,7 +167,7 @@ class RandomSelectorUseCaseTest {
         assertTrue(result.isSuccess)
         result.getOrNull()?.let { selectionResult ->
             assertTrue(selectionResult.selectedItem.text.startsWith("タスク"))
-    }
+        }
     }
 
     @Test
@@ -185,7 +180,6 @@ class RandomSelectorUseCaseTest {
         
         assertFalse(result.isSuccess)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        }
     }
 
     @Test
@@ -199,7 +193,6 @@ class RandomSelectorUseCaseTest {
         
         val performResult = useCase.performSelection(selection.id)
         assertFalse(performResult.isSuccess)
-        }
     }
 
     @Test
@@ -218,7 +211,6 @@ class RandomSelectorUseCaseTest {
         
         val afterClear = useCase.getAllSelectionResults().first()
         assertEquals(0, afterClear.size)
-        }
     }
 
     @Test
@@ -232,7 +224,6 @@ class RandomSelectorUseCaseTest {
         val categories = useCase.getAvailableCategories()
         assertTrue(categories.contains("仕事"))
         assertTrue(categories.contains("プライベート"))
-        }
     }
 
     @Test
@@ -247,6 +238,5 @@ class RandomSelectorUseCaseTest {
         val statistics = useCase.getSelectionStatistics()
         assertEquals(2, statistics.totalSelections)
         assertTrue(statistics.mostUsedItems.isNotEmpty())
-        }
     }
 }

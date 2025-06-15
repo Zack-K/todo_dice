@@ -1,15 +1,15 @@
-package diceapp.dice.usecase
+package com.diceapp.dice.usecase
 
 import com.diceapp.dice.model.Dice
 import com.diceapp.dice.model.StandardDice
 import com.diceapp.dice.repository.DiceRepository
 import com.diceapp.dice.usecase.DiceUseCase
-import diceapp.testutil.MockDiceRepository
+import com.diceapp.testutil.MockDiceRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
-import org.junit.Test
 import kotlin.random.Random
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -19,7 +19,7 @@ class DiceUseCaseTest {
     private lateinit var useCase: DiceUseCase
     private lateinit var repository: DiceRepository
 
-    @Before
+    @BeforeTest
     fun setup() {
         repository = MockDiceRepository()
         useCase = DiceUseCase(repository)
@@ -27,14 +27,14 @@ class DiceUseCaseTest {
 
     @Test
     fun `正常なダイスを振れる`() = runTest {
-            val result = useCase.rollDice(sides = 6, count = 1)
+        val result = useCase.rollDice(sides = 6, count = 1)
         
         assertTrue(result.isSuccess)
         result.getOrNull()?.let { roll ->
             assertEquals(6, roll.dice.sides)
             assertEquals(1, roll.dice.count)
             assertTrue(roll.results[0] in 1..6)
-    }
+        }
     }
 
     @Test
@@ -46,7 +46,7 @@ class DiceUseCaseTest {
         result.getOrNull()?.let { roll ->
             assertEquals(3, roll.modifier)
             assertEquals(roll.sum + 3, roll.total)
-    }
+        }
     }
 
     @Test
@@ -58,7 +58,7 @@ class DiceUseCaseTest {
             assertEquals(3, roll.results.size)
             roll.results.forEach { value ->
                 assertTrue(value in 1..6)
-        }
+            }
         }
     }
 
@@ -68,7 +68,6 @@ class DiceUseCaseTest {
         
         assertFalse(result.isSuccess)
         assertTrue(result.exceptionOrNull() is IllegalArgumentException)
-        }
     }
 
     @Test
@@ -79,7 +78,7 @@ class DiceUseCaseTest {
         result.getOrNull()?.let { roll ->
             assertEquals(20, roll.dice.sides)
             assertTrue(roll.results[0] in 1..20)
-    }
+        }
     }
 
     @Test
@@ -99,7 +98,7 @@ class DiceUseCaseTest {
             assertEquals(20, rolls[1].dice.sides)
             assertEquals(4, rolls[2].dice.sides)
             assertEquals(2, rolls[2].results.size)
-    }
+        }
     }
 
     @Test
@@ -111,7 +110,7 @@ class DiceUseCaseTest {
             assertEquals(6, roll.dice.sides)
             assertEquals(2, roll.dice.count)
             assertEquals(0, roll.modifier)
-    }
+        }
     }
 
     @Test
@@ -123,7 +122,7 @@ class DiceUseCaseTest {
             assertEquals(20, roll.dice.sides)
             assertEquals(1, roll.dice.count)
             assertEquals(5, roll.modifier)
-    }
+        }
     }
 
     @Test
@@ -135,7 +134,7 @@ class DiceUseCaseTest {
             assertEquals(8, roll.dice.sides)
             assertEquals(3, roll.dice.count)
             assertEquals(-2, roll.modifier)
-    }
+        }
     }
 
     @Test
@@ -152,7 +151,7 @@ class DiceUseCaseTest {
         invalidNotations.forEach { notation ->
             val result = useCase.parseDiceNotation(notation)
             assertFalse(result.isSuccess, "記法 '$notation' はエラーになるべきです")
-    }
+        }
     }
 
     @Test
@@ -162,7 +161,6 @@ class DiceUseCaseTest {
         
         val allRolls = useCase.getAllRolls().first()
         assertEquals(2, allRolls.size)
-        }
     }
 
     @Test
@@ -176,7 +174,6 @@ class DiceUseCaseTest {
         
         val d20Rolls = useCase.getRollsByDiceType(20).first()
         assertEquals(1, d20Rolls.size)
-        }
     }
 
     @Test
@@ -191,7 +188,6 @@ class DiceUseCaseTest {
         
         val afterClear = useCase.getAllRolls().first()
         assertEquals(0, afterClear.size)
-        }
     }
 
     @Test
@@ -203,7 +199,6 @@ class DiceUseCaseTest {
         val statistics = useCase.getDiceStatistics(6)
         assertEquals(5, statistics.totalRolls)
         assertTrue(statistics.averageResult > 0.0)
-        }
     }
 
     @Test
@@ -213,6 +208,6 @@ class DiceUseCaseTest {
         assertTrue(result.isSuccess)
         result.getOrNull()?.let { roll ->
             assertTrue(roll.dice.sides in listOf(4, 6, 8, 10, 12, 20))
-    }
+        }
     }
 }

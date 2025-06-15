@@ -38,14 +38,29 @@ fun App() {
                 title = { Text("DiceApp") }
             )
             
-            // タブ
-            TabRow(selectedTabIndex = selectedTab) {
+            // タブ - モバイル最適化
+            TabRow(
+                selectedTabIndex = selectedTab,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
                         selected = selectedTab == index,
                         onClick = { selectedTab = index },
-                        text = { Text(title) },
-                        icon = { Icon(icons[index], contentDescription = title) }
+                        text = { 
+                            Text(
+                                text = title,
+                                maxLines = 1
+                            ) 
+                        },
+                        icon = { 
+                            Icon(
+                                imageVector = icons[index], 
+                                contentDescription = title,
+                                modifier = Modifier.size(24.dp)
+                            ) 
+                        },
+                        modifier = Modifier.height(72.dp) // モバイル向けタッチターゲット最適化
                     )
                 }
             }
