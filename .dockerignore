@@ -1,0 +1,47 @@
+# Git関連
+.git/
+.gitignore
+.github/
+
+# IDE設定
+.idea/
+*.iml
+.vscode/
+
+# ビルド成果物
+build/
+.gradle/
+composeApp/build/
+
+# テスト結果
+**/test-results/
+**/reports/
+
+# ログファイル
+*.log
+logs/
+
+# 一時ファイル
+*.tmp
+.DS_Store
+Thumbs.db
+
+# 環境設定
+.env*
+local.properties
+
+# ドキュメント
+README.md
+*.md
+
+# Docker関連（他のDockerfile）
+Dockerfile.*
+docker-compose*.yml
+
+# キャッシュ
+.cache/
+node_modules/
+
+# バックアップファイル
+*.bak
+*.backup
